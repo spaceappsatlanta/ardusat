@@ -1,24 +1,24 @@
-<%- model_class = ArduSat -%>
+<%- model_class = Arduino -%>
 <div class="page-header">
   <h1><%=t '.title', :default => model_class.model_name.human %></h1>
 </div>
 
 <dl class="dl-horizontal">
   <dt><strong><%= model_class.human_attribute_name(:name) %>:</strong></dt>
-  <dd><%= @ardu_sat.name %></dd>
+  <dd><%= @arduino.name %></dd>
   <dt><strong><%= model_class.human_attribute_name(:mac_address) %>:</strong></dt>
-  <dd><%= @ardu_sat.mac_address %></dd>
+  <dd><%= @arduino.mac_address %></dd>
   <dt><strong><%= model_class.human_attribute_name(:email) %>:</strong></dt>
-  <dd><%= @ardu_sat.email %></dd>
+  <dd><%= @arduino.email %></dd>
 </dl>
 
 <div class="form-actions">
   <%= link_to t('.back', :default => t("helpers.links.back")),
-              ardu_sats_path, :class => 'btn'  %>
+              arduino_path, :class => 'btn'  %>
   <%= link_to t('.edit', :default => t("helpers.links.edit")),
-              edit_ardu_sat_path(@ardu_sat), :class => 'btn' %>
+              edit_arduino_path(@arduino), :class => 'btn' %>
   <%= link_to t('.destroy', :default => t("helpers.links.destroy")),
-              ardu_sat_path(@ardu_sat),
+              arduino_path(@arduino),
               :method => 'delete',
               :data => { :confirm => t('.confirm', :default => t("helpers.links.confirm", :default => 'Are you sure?')) },
               :class => 'btn btn-danger' %>

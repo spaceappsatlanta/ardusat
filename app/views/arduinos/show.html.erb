@@ -1,0 +1,20 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <b>Name:</b>
+  <%= @arduino.name %>
+</p>
+
+<p>
+  <b>Mac address:</b>
+  <%= @arduino.mac_address %>
+</p>
+
+<p>
+  <b>Email:</b>
+  <%= @arduino.email %>
+</p>
+
+
+<%= link_to 'Edit', edit_arduino_path(@arduino) %> |
+<%= link_to 'Back', arduinos_path %>

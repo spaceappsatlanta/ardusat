@@ -1,0 +1,27 @@
+<h1>Listing arduinos</h1>
+
+<table>
+  <tr>
+    <th>Name</th>
+    <th>Mac address</th>
+    <th>Email</th>
+    <th></th>
+    <th></th>
+    <th></th>
+  </tr>
+
+<% @arduinos.each do |arduino| %>
+  <tr>
+    <td><%= arduino.name %></td>
+    <td><%= arduino.mac_address %></td>
+    <td><%= arduino.email %></td>
+    <td><%= link_to 'Show', arduino %></td>
+    <td><%= link_to 'Edit', edit_arduino_path(arduino) %></td>
+    <td><%= link_to 'Destroy', arduino, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+  </tr>
+<% end %>
+</table>
+
+<br />
+
+<%= link_to 'New Arduino', new_arduino_path %>

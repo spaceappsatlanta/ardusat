@@ -1,7 +1,4 @@
-Ardusat::Application.routes.draw do
-  resources :ardu_sats
-
-  resources :main, only: ['index']
+Ardusat::Application.routes.draw do  resources :main, only: ['index']
 
 
   # The priority is based upon order of creation:

@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class ArduSatTest < ActiveSupport::TestCase
+class ArduinoTest < ActiveSupport::TestCase
   # test "the truth" do
   #   assert true
   # end

@@ -1,6 +1,6 @@
-class CreateArduSats < ActiveRecord::Migration
+class CreateArduinos < ActiveRecord::Migration
   def change
-    create_table :ardu_sats do |t|
+    create_table :arduinos do |t|
       t.string :name
       t.string :mac_address
       t.string :email
