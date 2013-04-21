@@ -160,14 +160,15 @@ void MagConfig(void){
 void loop() { 
   // read the value from the 1 dimensional sensors:
   if(enableTempSensor){
-    // temperature sensor 
+    // digital temperature sensor 
     float tempSensorCelsius = getTempSensorCelsius();
-    //Serial.print("Celsius: ");
-    //Serial.println(celsius);
-    //float fahrenheit = (1.8 * celsius) + 32;  
-    //Serial.print("Fahrenheit: ");
-    //Serial.println(fahrenheit);
-    //outputFrame(Sid, L, databytes)
+    Serial.print("Digital thermometer Celsius: ");
+    Serial.println(tempSensorCelsius);
+    float fahrenheit = (1.8 * tempSensorCelsius) + 32;  
+    Serial.print("Digital thermometer Fahrenheit: ");
+    Serial.println(fahrenheit);
+    Serial.println();
+    //prepare frame (Sid, L, databytes)
     byte * tempData;
     tempData=(byte*)&tempSensorCelsius;
     // data segment: 1 float value
@@ -193,10 +194,11 @@ void loop() {
     lumSensorValueFull = lumSensorValueLum & 0xFFFF;
     lumSensorValueVisible = lumSensorValueFull-lumSensorValueIR;
     lumSensorValueLux = tsl.calculateLux(lumSensorValueFull, lumSensorValueIR);
-    //Serial.print("IR: "); Serial.print(lumSensorValueIR);   Serial.print("\t\t");
-    //Serial.print("Full: "); Serial.print(lumSensorValueFull);   Serial.print("\t");
-    //Serial.print("Visible: "); Serial.print(lumSensorValueVisible);   Serial.print("\t");
-    //Serial.print("Lux: "); Serial.println(lumSensorValueLux);
+    Serial.print("Lum Sensor IR: "); Serial.print(lumSensorValueIR);   Serial.println();
+    Serial.print("Lum Sensor Full: "); Serial.print(lumSensorValueFull);   Serial.println();
+    Serial.print("Lum Sensor Visible: "); Serial.print(lumSensorValueVisible);   Serial.println();
+    Serial.print("Lum Sensor Lux: "); Serial.println(lumSensorValueLux);
+    Serial.println();
     //outputFrame(Sid, L, databytes)
     byte lumData[10];
     // data segment: 4 int16 values: IR, Full, Visible, Lux
@@ -217,7 +219,14 @@ void loop() {
     // read the 3D value from the inertial sensor:  
     my3IMU.getRawValues(rawImuValues);
     //serialPrintFloatArr(rawImuValues, 6);
-    //Serial.println(""); //line break
+    for(int i=0;i<6;i++){
+      Serial.print("Inertial Axis ");
+      Serial.print(i);
+      Serial.print(" :");
+      Serial.println(rawImuValues[i]);
+      
+    }
+    Serial.println(""); //line break
     byte * imuData;
     imuData=(byte*)&rawImuValues;
     // data segment: 6 floats to byte stream: Ax,Ay,Az,Gx,Gy,Gz
@@ -249,7 +258,16 @@ void loop() {
       heading = 0.0; 
     }
     magData[6] = heading;
-
+    Serial.print("Magnetometer: X(");
+    Serial.print(x);
+    Serial.print(") Y(");
+    Serial.print(y);
+    Serial.print(") Z(");
+    Serial.print(z);
+    Serial.print(") heading(");
+    Serial.print(heading);
+    Serial.println(")");
+    Serial.println();
     outputFrame(idMagnetometer,10,magData); 
   }
 
@@ -283,8 +301,9 @@ void loop() {
     
     float celcius = tempData - 273.15;
     float fahrenheit = (celcius*1.8) + 32;
-    //Serial.print("celcius: ");
-    //Serial.println(celcius);
+    Serial.print("IR thermometer celcius: ");
+    Serial.println(celcius);
+    Serial.println();
     byte * tempBytes=(byte*)&celcius;
     outputFrame(idTemperatureIR,4,tempBytes); 
   }
@@ -313,7 +332,7 @@ float getTempSensorCelsius(){
 
   //it's a 12bit int, using two's compliment for negative
   int TemperatureSum = ((MSB << 8) | LSB) >> 4; 
-
+  
   float celsius = TemperatureSum*0.0625;
   return celsius;
 }
@@ -342,12 +361,13 @@ void outputFrame(int sensorID, int length, byte * data){
   //Serial.write(frame,length+2);
   
   // debug communication
-  //Serial.print("Frame: ");
+  Serial.println("Frame: ");
   for(int i=0;i<length+2;i++){
     if(frame[i]<0x10)Serial.print("0");
     Serial.print(frame[i] & 0xFF,HEX);
   }
   Serial.println();
+  Serial.println("------");
 }
 
 
