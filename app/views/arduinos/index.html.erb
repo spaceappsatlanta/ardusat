@@ -1,27 +1,40 @@
-<h1>Listing arduinos</h1>
-
-<table>
-  <tr>
-    <th>Name</th>
-    <th>Mac address</th>
-    <th>Email</th>
-    <th></th>
-    <th></th>
-    <th></th>
-  </tr>
-
-<% @arduinos.each do |arduino| %>
-  <tr>
-    <td><%= arduino.name %></td>
-    <td><%= arduino.mac_address %></td>
-    <td><%= arduino.email %></td>
-    <td><%= link_to 'Show', arduino %></td>
-    <td><%= link_to 'Edit', edit_arduino_path(arduino) %></td>
-    <td><%= link_to 'Destroy', arduino, method: :delete, data: { confirm: 'Are you sure?' } %></td>
-  </tr>
-<% end %>
+<%- model_class = Arduino -%>
+<div class="page-header">
+  <h1><%=t '.title', :default => model_class.model_name.human.pluralize %></h1>
+</div>
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th><%= model_class.human_attribute_name(:id) %></th>
+      <th><%= model_class.human_attribute_name(:name) %></th>
+      <th><%= model_class.human_attribute_name(:mac_address) %></th>
+      <th><%= model_class.human_attribute_name(:email) %></th>
+      <th><%= model_class.human_attribute_name(:created_at) %></th>
+      <th><%=t '.actions', :default => t("helpers.actions") %></th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @arduinos.each do |arduino| %>
+      <tr>
+        <td><%= link_to arduino.id, arduino_path(arduino) %></td>
+        <td><%= arduino.name %></td>
+        <td><%= arduino.mac_address %></td>
+        <td><%= arduino.email %></td>
+        <td><%=l arduino.created_at %></td>
+        <td>
+          <%= link_to t('.edit', :default => t("helpers.links.edit")),
+                      edit_arduino_path(arduino), :class => 'btn btn-mini' %>
+          <%= link_to t('.destroy', :default => t("helpers.links.destroy")),
+                      arduino_path(arduino),
+                      :method => :delete,
+                      :data => { :confirm => t('.confirm', :default => t("helpers.links.confirm", :default => 'Are you sure?')) },
+                      :class => 'btn btn-mini btn-danger' %>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
 </table>
 
-<br />
-
-<%= link_to 'New Arduino', new_arduino_path %>
+<%= link_to t('.new', :default => t("helpers.links.new")),
+            new_arduino_path,
+            :class => 'btn btn-primary' %>

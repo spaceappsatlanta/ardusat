@@ -1,10 +1,10 @@
 Ardusat::Application.routes.draw do  resources :main, only: ['index']
 
-  resources :sensor, only: ['create'] do
-    collection {
-      post :temperature
-      post :temperatures
-    }
+  resources :arduinos
+  
+  namespace :sensor, only: ['create'] do
+    post :temperature
+    post :temperatures
   end
 
   # The priority is based upon order of creation:

@@ -1,20 +1,25 @@
-<p id="notice"><%= notice %></p>
+<%- model_class = Arduino -%>
+<div class="page-header">
+  <h1><%=t '.title', :default => model_class.model_name.human %></h1>
+</div>
 
-<p>
-  <b>Name:</b>
-  <%= @arduino.name %>
-</p>
+<dl class="dl-horizontal">
+  <dt><strong><%= model_class.human_attribute_name(:name) %>:</strong></dt>
+  <dd><%= @arduino.name %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:mac_address) %>:</strong></dt>
+  <dd><%= @arduino.mac_address %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:email) %>:</strong></dt>
+  <dd><%= @arduino.email %></dd>
+</dl>
 
-<p>
-  <b>Mac address:</b>
-  <%= @arduino.mac_address %>
-</p>
-
-<p>
-  <b>Email:</b>
-  <%= @arduino.email %>
-</p>
-
-
-<%= link_to 'Edit', edit_arduino_path(@arduino) %> |
-<%= link_to 'Back', arduinos_path %>
+<div class="form-actions">
+  <%= link_to t('.back', :default => t("helpers.links.back")),
+              arduinos_path, :class => 'btn'  %>
+  <%= link_to t('.edit', :default => t("helpers.links.edit")),
+              edit_arduino_path(@arduino), :class => 'btn' %>
+  <%= link_to t('.destroy', :default => t("helpers.links.destroy")),
+              arduino_path(@arduino),
+              :method => 'delete',
+              :data => { :confirm => t('.confirm', :default => t("helpers.links.confirm", :default => 'Are you sure?')) },
+              :class => 'btn btn-danger' %>
+</div>

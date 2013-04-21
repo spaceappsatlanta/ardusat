@@ -18,4 +18,8 @@ class TemperatureSensor < ActiveRecord::Base
       errors.add(:unit, "Unit must be of type : #{TEMPERATURE_TYPES.join(', ')}" )
     end
   end
+
+  def as_json(options = {})
+    super(only: [:capture_time, :data, :unit, :created_at])
+  end
 end
