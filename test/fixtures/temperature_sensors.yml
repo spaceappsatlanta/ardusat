@@ -1,0 +1,13 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/Fixtures.html
+
+one:
+  arduino_id: 1
+  capture_time: 2013-04-20 21:51:17
+  data: 1.5
+  temperature_type: MyString
+
+two:
+  arduino_id: 1
+  capture_time: 2013-04-20 21:51:17
+  data: 1.5
+  temperature_type: MyString
