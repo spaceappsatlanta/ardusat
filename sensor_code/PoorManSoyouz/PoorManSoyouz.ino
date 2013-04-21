@@ -27,47 +27,41 @@
 
 #include "CommunicationUtils.h" // for inertial sensor
 #include "FreeSixIMU.h" // inertial sensor
+#include "TSL2561.h" // for lum sensor
 #include <Wire.h> // for inertial sensor and temp sensor
-#include "TSL2561.h" // for temp sensor and 
 
-void setup() {
-  Serial.begin(115200);
-  Wire.begin();
-
-  delay(5);
-  my3IMU.init();
-  delay(5);
-}
 
 // rate at which the arduino should sample data
 int SampleInterval = 100; //ms
 
 // Enable your sensors and specify pins below, starting at digital 2 and analog A0  
-bit enableTempSensor = 0;
-int TempSensorPin = A0;
+boolean enableTempSensor = false;
+int i2cTemperatureAddress = 0x48;
 
-bit enableLightSensor = 0;
-int lightSensorPin = A1;
-
-bit enableCam = 0;
+boolean enableCam = false;
 int camControlPin = 12;
 int camDataPin = 13;
 
-bit enableIMU = 0;
+boolean enableImu = false;
 int imuClockPin = A5;
 int imuDataPin = A4;
 
-bit enableMag = 0;
-int magClockPin = A3
-int magDataPin = A2
+boolean enableMag = false;
+int magClockPin = A3;
+int magDataPin = A2;
 
-bit enableIrSensor = 0;
-int irSensorPin = 11;
-
+boolean enableLumSensor = false;
+int lumSensorPin=0x39; // note below
+  // The address will be different depending on whether you let
+  // the ADDR pin float (addr 0x39), or tie it to ground or vcc. In those cases
+  // use TSL2561_ADDR_LOW (0x29) or TSL2561_ADDR_HIGH (0x49) respectively
+  
 //variables to store the value coming from the analog sensors
 int tempSensorCelsius = 0; 
-int irSensorValue = 0; 
-int lightSensorValue = 0; 
+int lumSensorValueIR = 0; 
+int lumSensorValueVisible = 0; 
+int lumSensorValueFull = 0; 
+int lumSensorValueLux = 0; 
 
 //variables to store the 3D values
 float rawImuValues[6]; // coming from the inertial sensor
@@ -76,37 +70,39 @@ float rawMagValues[3]; // coming from magnetometer sensor
 // Initialize the FreeIMU object for the inertial sensor
 FreeSixIMU my3IMU = FreeSixIMU();
 
-if(enableTempSensor){
-  // initialize temp sensor
-  int i2cTemperatureAddress = 0x48;
-  TSL2561 tsl(TSL2561_ADDR_FLOAT); // note below
-  // The address will be different depending on whether you let
-  // the ADDR pin float (addr 0x39), or tie it to ground or vcc. In those cases
-  // use TSL2561_ADDR_LOW (0x29) or TSL2561_ADDR_HIGH (0x49) respectively
-  if (tsl.begin()) {
-    Serial.println("Found sensor");
-  } else {
-    Serial.println("No sensor?");
-    while (1);
-  }
-  // You can change the gain on the fly, to adapt to brighter/dimmer light situations
-  //tsl.setGain(TSL2561_GAIN_0X);         // set no gain (for bright situtations)
-  tsl.setGain(TSL2561_GAIN_16X);      // set 16x gain (for dim situations)
-  
-  // Changing the integration time gives you a longer time over which to sense light
-  // longer timelines are slower, but are good in very low light situtations!
-  tsl.setTiming(TSL2561_INTEGRATIONTIME_13MS);  // shortest integration time (bright light)
-  //tsl.setTiming(TSL2561_INTEGRATIONTIME_101MS);  // medium integration time (medium light)
-  //tsl.setTiming(TSL2561_INTEGRATIONTIME_402MS);  // longest integration time (dim light)
-  
-  // Now we're ready to get readings!
-  
-  Wire.begin();
-}
+// Initialize the lum sensor object for the sensor
+TSL2561 tsl(lumSensorPin); 
 
 void setup() {
-  // declare the ledPin as an OUTPUT:
-  pinMode(ledPin, OUTPUT);  
+  if(enableLumSensor){
+    // initialize luminosity sensor
+    if (tsl.begin()) {
+      Serial.println("Found sensor");
+    } else {
+      Serial.println("No sensor?");
+      while (1);
+    }
+    // You can change the gain on the fly, to adapt to brighter/dimmer light situations
+    //tsl.setGain(TSL2561_GAIN_0X);         // set no gain (for bright situtations)
+    tsl.setGain(TSL2561_GAIN_16X);      // set 16x gain (for dim situations)
+    
+    // Changing the integration time gives you a longer time over which to sense light
+    // longer timelines are slower, but are good in very low light situtations!
+    tsl.setTiming(TSL2561_INTEGRATIONTIME_13MS);  // shortest integration time (bright light)
+    //tsl.setTiming(TSL2561_INTEGRATIONTIME_101MS);  // medium integration time (medium light)
+    //tsl.setTiming(TSL2561_INTEGRATIONTIME_402MS);  // longest integration time (dim light)
+    
+    Wire.begin();
+  }
+  
+  Serial.begin(115200);
+  Wire.begin();
+
+  if(enableImu){
+    delay(5);
+    my3IMU.init();
+    delay(5);
+  }
 }
 
 /*
@@ -125,11 +121,7 @@ void loop() {
     //Serial.println(fahrenheit);
   }
   
-  if(enableLightSensor){
-    lightsSensorValue = analogRead(lightSensorPin);
-  }
-  
-  if(enableIrSensor){
+  if(enableLumSensor){
     // read the infrared, fullspecrtrum diode or 'visible' (difference between the two) channels.
     
     // SLOW method / multiple calls
@@ -142,23 +134,23 @@ void loop() {
     // FAST method, single call
     // More advanced data read example. Read 32 bits with top 16 bits IR, bottom 16 bits full spectrum
     // That way you can do whatever math and comparisons you want!
-    uint32_t irSensorValueLum = tsl.getFullLuminosity();
-    uint16_t irSensorValueIR, irSensorValueFull;
-    irSensorValueIR = irSensorValueLum >> 16;
-    irSensorValueFull = irSensorValueLum & 0xFFFF;
-    irSensorValueVisible = irSensorValueFull-irSensorValueIR;
-    irSensorValueLux = tsl.calculateLux(irSensorValueFull, irSensorValueIR);
-    //Serial.print("IR: "); Serial.print(irSensorValueIR);   Serial.print("\t\t");
-    //Serial.print("Full: "); Serial.print(irSensorValueFull);   Serial.print("\t");
-    //Serial.print("Visible: "); Serial.print(irSensorValueFull - irSensorValueIR);   Serial.print("\t");
-    //Serial.print("Lux: "); Serial.println(irSensorValueLux);
+    uint32_t lumSensorValueLum = tsl.getFullLuminosity();
+    uint16_t lumSensorValueIR, lumSensorValueFull;
+    lumSensorValueIR = lumSensorValueLum >> 16;
+    lumSensorValueFull = lumSensorValueLum & 0xFFFF;
+    lumSensorValueVisible = lumSensorValueFull-lumSensorValueIR;
+    lumSensorValueLux = tsl.calculateLux(lumSensorValueFull, lumSensorValueIR);
+    //Serial.print("IR: "); Serial.print(lumSensorValueIR);   Serial.print("\t\t");
+    //Serial.print("Full: "); Serial.print(lumSensorValueFull);   Serial.print("\t");
+    //Serial.print("Visible: "); Serial.print(lumSensorValueVisible);   Serial.print("\t");
+    //Serial.print("Lux: "); Serial.println(lumSensorValueLux);
   }
   
   // read the value from the 3D sensors:
   
-  if(enableIMU){
+  if(enableImu){
     // read the 3D value from the inertial sensor:  
-    my3IMU.getRawValues(raw);
+    my3IMU.getRawValues(rawImuValues);
     serialPrintFloatArr(rawImuValues, 6);
     Serial.println(""); //line break
   }
