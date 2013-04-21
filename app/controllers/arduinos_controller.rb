@@ -32,11 +32,6 @@ class ArduinosController < ApplicationController
     end
   end
 
-  # GET /arduinos/1/edit
-  def edit
-    @arduino = Arduino.find(params[:id])
-  end
-
   # POST /arduinos
   # POST /arduinos.json
   def create

@@ -1,29 +1,26 @@
-<%= form_for(@arduino) do |f| %>
-  <% if @arduino.errors.any? %>
-    <div id="error_explanation">
-      <h2><%= pluralize(@arduino.errors.count, "error") %> prohibited this arduino from being saved:</h2>
-
-      <ul>
-      <% @arduino.errors.full_messages.each do |msg| %>
-        <li><%= msg %></li>
-      <% end %>
-      </ul>
+<%= form_for @arduino, :html => { :class => 'form-horizontal' } do |f| %>
+  <div class="control-group">
+    <%= f.label :name, :class => 'control-label' %>
+    <div class="controls">
+      <%= f.text_field :name, :class => 'text_field' %>
     </div>
-  <% end %>
+  </div>
+  <div class="control-group">
+    <%= f.label :mac_address, :class => 'control-label' %>
+    <div class="controls">
+      <%= f.text_field :mac_address, :class => 'text_field' %>
+    </div>
+  </div>
+  <div class="control-group">
+    <%= f.label :email, :class => 'control-label' %>
+    <div class="controls">
+      <%= f.text_field :email, :class => 'text_field' %>
+    </div>
+  </div>
 
-  <div class="field">
-    <%= f.label :name %><br />
-    <%= f.text_field :name %>
-  </div>
-  <div class="field">
-    <%= f.label :mac_address %><br />
-    <%= f.text_field :mac_address %>
-  </div>
-  <div class="field">
-    <%= f.label :email %><br />
-    <%= f.text_field :email %>
-  </div>
-  <div class="actions">
-    <%= f.submit %>
+  <div class="form-actions">
+    <%= f.submit nil, :class => 'btn btn-primary' %>
+    <%= link_to t('.cancel', :default => t("helpers.links.cancel")),
+                arduinos_path, :class => 'btn' %>
   </div>
 <% end %>
