@@ -263,14 +263,14 @@ void loop() {
     i2c_start_wait(dev+I2C_WRITE);
     i2c_write(0x07);
     
-    Serial.print("IR temp reading...");
+    //Serial.print("IR temp reading...");
     // read
     i2c_rep_start(dev+I2C_READ);
     data_low = i2c_readAck(); //Read 1 byte and then send ack
     data_high = i2c_readAck(); //Read 1 byte and then send ack
     pec = i2c_readNak();
     i2c_stop();
-    Serial.println("read complete.");
+    //Serial.println("read complete.");
     
     //This converts high and low bytes together and processes temperature, MSB is a error bit and is ignored for temps
     double tempFactor = 0.02; // 0.02 degrees per LSB (measurement resolution of the MLX90614)
@@ -283,8 +283,8 @@ void loop() {
     
     float celcius = tempData - 273.15;
     float fahrenheit = (celcius*1.8) + 32;
-    Serial.print("celcius: ");
-    Serial.println(celcius);
+    //Serial.print("celcius: ");
+    //Serial.println(celcius);
     byte * tempBytes=(byte*)&celcius;
     outputFrame(idTemperatureIR,4,tempBytes); 
   }
@@ -321,26 +321,33 @@ float getTempSensorCelsius(){
 // ########## FRAME OUTPUT ##############
 
 void outputFrame(int sensorID, int length, byte * data){
+  /*
   Serial.print("Sensor: ");
   Serial.println(sensorID);
+  Serial.print("Length: ");
+  Serial.println(length);
+  */
   // write frame to host (raspberry pi, pc or else)
   // frame bytes format with L in bytes.
   //   0   1   2-N
   // [Sid][L][Data]
   byte frame[length+2];
   // Write first byte (sensor ID) and second byte (length)
-  frame[0] = (sensorID && 0xFF) <<8 | (length && 0xFF);
+  frame[0] = (byte)(sensorID);
+  frame[1] = (byte)length;
   // write remaining bytes (data bytes)
-  for(int i=0;i<length;i++){
-    frame[i+2]=data[i];
-  }
+  memcpy(frame+2,data,length);
+  
   // real communication
   //Serial.write(frame,length+2);
+  
   // debug communication
+  //Serial.print("Frame: ");
   for(int i=0;i<length+2;i++){
-    Serial.print(frame[i],HEX);
+    if(frame[i]<0x10)Serial.print("0");
+    Serial.print(frame[i] & 0xFF,HEX);
   }
-  Serial.println(length+2);
+  Serial.println();
 }
 
 
